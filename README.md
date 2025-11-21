@@ -248,6 +248,3 @@ This machine learning pipeline effectively detects fraudulent transactions using
 
 ---
 
-### ⭐ If you need:
-
-I can also generate a **requirements.txt**, **app.py**, **training code**, or a **GitHub description badge section**.
