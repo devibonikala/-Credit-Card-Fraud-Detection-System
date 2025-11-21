@@ -66,7 +66,7 @@ Feature Engineering → Model Building → Model Evaluation → Deployment
                               |
                               v
          +------------------------------------------------+
-         | Save Model (Pickle) + Deploy Using Streamlit   |
+         | Save Model (Pickle) + Deploy Using Flask       |
          +------------------------------------------------+
 ```
 
