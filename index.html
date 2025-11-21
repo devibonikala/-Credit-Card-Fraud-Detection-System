@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Fraud Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #343a40;
+            --secondary-color: #6c757d;
+            --safe-color: #d4edda;
+            --safe-text: #155724;
+            --fraud-color: #f8d7da;
+            --fraud-text: #721c24;
+            --error-color: #fff3cd;
+            --error-text: #856404;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #23272b;
+            border-color: #23272b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(52, 58, 64, 0.25);
+        }
+        
+        .result-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .safe {
+            background-color: var(--safe-color);
+            color: var(--safe-text);
+            border-left: 5px solid #28a745;
+        }
+        
+        .fraud {
+            background-color: var(--fraud-color);
+            color: var(--fraud-text);
+            border-left: 5px solid #dc3545;
+        }
+        
+        .error {
+            background-color: var(--error-color);
+            color: var(--error-text);
+            border-left: 5px solid #ffc107;
+        }
+        
+        .feature-input {
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-label i {
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 0;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .pca-component {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .pca-component:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pca-description {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        footer p {
+            margin-bottom: 0.5rem;
+        }
+        
+        footer .small {
+            opacity: 0.7;
+        }
+        
+        .tooltip-inner {
+            max-width: 300px;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        @media (max-width: 992px) {
+            .col-md-4 {
+                width: 50%;
+            }
+            
+            .hero-section {
+                padding: 3rem 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .col-md-4 {
+                width: 100%;
+            }
+            
+            .hero-section {
+                padding: 2.5rem 0;
+            }
+            
+            .card-header {
+                padding: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-section p {
+                font-size: 1rem;
+            }
+            
+            .btn-primary {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 animate-fade">Credit Card Fraud Detection</h1>
+            <p class="lead animate-fade delay-1">Advanced machine learning to protect your transactions</p>
+            <div class="animate-fade delay-2 mt-4">
+                <i class="fas fa-shield-alt fa-3x mb-3" style="opacity: 0.8;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card animate-fade delay-3">
+                    <div class="card-header text-center">
+                        <h3><i class="fas fa-credit-card me-2"></i>Transaction Details</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/predict" method="POST">
+                            <!-- Basic Information Section -->
+                            <h5 class="section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="feature-input">
+                                        <label class="feature-label"><i class="fas fa-clock"></i>Time</label>
+                                        <input type="number" step="any" class="form-control" name="Time" placeholder="Seconds since first transaction" required>
+                                        <small class="text-muted">Time in seconds since the first transaction</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="feature-input">
+                                        <label class="feature-label"><i class="fas fa-money-bill-wave"></i>Amount</label>
+                                        <input type="number" step="0.01" class="form-control" name="Amount" placeholder="Transaction amount" required>
+                                        <small class="text-muted">Transaction amount in dollars</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PCA Components Section -->
+                            <h5 class="section-title"><i class="fas fa-chart-line me-2"></i>Transaction Features</h5>
+                            <div class="row">
+                                <!-- V1-V9 -->
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-wave-square"></i>Transaction Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V1" placeholder="Enter V1 value" required>
+                                        <div class="pca-description">Principal component representing transaction frequency pattern</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-chart-bar"></i>Amount Consistency </label>
+                                        <input type="number" step="any" class="form-control" name="V2" placeholder="Enter V2 value" required>
+                                        <div class="pca-description">Measures consistency with historical transaction amounts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-map-marker-alt"></i>Location Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V3" placeholder="Enter V3 value" required>
+                                        <div class="pca-description">Geographical spending pattern component</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-calendar-alt"></i>Time Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V4" placeholder="Enter V4 value" required>
+                                        <div class="pca-description">Temporal spending behavior component</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-store"></i>Merchant Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V5" placeholder="Enter V5 value" required>
+                                        <div class="pca-description">Merchant category spending pattern</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-mobile-alt"></i>Device Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V6" placeholder="Enter V6 value" required>
+                                        <div class="pca-description">Device usage pattern component</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-shopping-cart"></i>Purchase Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V7" placeholder="Enter V7 value" required>
+                                        <div class="pca-description">Purchase behavior component</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-credit-card"></i>Card Usage </label>
+                                        <input type="number" step="any" class="form-control" name="V8" placeholder="Enter V8 value" required>
+                                        <div class="pca-description">Card usage frequency pattern</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-exchange-alt"></i>Transaction Flow </label>
+                                        <input type="number" step="any" class="form-control" name="V9" placeholder="Enter V9 value" required>
+                                        <div class="pca-description">Transaction sequence pattern</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- V10-V19 -->
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-percentage"></i>Amount Variability </label>
+                                        <input type="number" step="any" class="form-control" name="V10" placeholder="Enter V10 value" required>
+                                        <div class="pca-description">Variability in transaction amounts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-random"></i>Transaction Randomness </label>
+                                        <input type="number" step="any" class="form-control" name="V11" placeholder="Enter V11 value" required>
+                                        <div class="pca-description">Measure of transaction unpredictability</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-balance-scale"></i>Amount Distribution </label>
+                                        <input type="number" step="any" class="form-control" name="V12" placeholder="Enter V12 value" required>
+                                        <div class="pca-description">Statistical distribution of amounts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-project-diagram"></i>Network Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V13" placeholder="Enter V13 value" required>
+                                        <div class="pca-description">Network transaction patterns</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-bolt"></i>Transaction Speed </label>
+                                        <input type="number" step="any" class="form-control" name="V14" placeholder="Enter V14 value" required>
+                                        <div class="pca-description">Velocity of sequential transactions</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-undo"></i>Recurrence Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V15" placeholder="Enter V15 value" required>
+                                        <div class="pca-description">Pattern of recurring transactions</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-chart-area"></i>Amount Stability </label>
+                                        <input type="number" step="any" class="form-control" name="V16" placeholder="Enter V16 value" required>
+                                        <div class="pca-description">Stability in transaction amounts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-globe"></i>Geo Dispersion </label>
+                                        <input type="number" step="any" class="form-control" name="V17" placeholder="Enter V17 value" required>
+                                        <div class="pca-description">Geographical distribution of transactions</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-stopwatch"></i>Time Variability </label>
+                                        <input type="number" step="any" class="form-control" name="V18" placeholder="Enter V18 value" required>
+                                        <div class="pca-description">Variation in transaction timing</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-code-branch"></i>Behavioral Split </label>
+                                        <input type="number" step="any" class="form-control" name="V19" placeholder="Enter V19 value" required>
+                                        <div class="pca-description">Divergence from normal behavior</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- V20-V28 -->
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-compress-alt"></i>Amount Compression </label>
+                                        <input type="number" step="any" class="form-control" name="V20" placeholder="Enter V20 value" required>
+                                        <div class="pca-description">Pattern of rounded/compressed amounts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-network-wired"></i>Network Depth </label>
+                                        <input type="number" step="any" class="form-control" name="V21" placeholder="Enter V21 value" required>
+                                        <div class="pca-description">Transaction network complexity</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-funnel-dollar"></i>Amount Filtering </label>
+                                        <input type="number" step="any" class="form-control" name="V22" placeholder="Enter V22 value" required>
+                                        <div class="pca-description">Filtering patterns in amounts</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-chess-board"></i>Grid Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V23" placeholder="Enter V23 value" required>
+                                        <div class="pca-description">Systematic transaction patterns</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-satellite-dish"></i>Signal Strength </label>
+                                        <input type="number" step="any" class="form-control" name="V24" placeholder="Enter V24 value" required>
+                                        <div class="pca-description">Transaction signal clarity</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-vector-square"></i>Vector Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V25" placeholder="Enter V25 value" required>
+                                        <div class="pca-description">Directional spending patterns</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-dice"></i>Randomness Index </label>
+                                        <input type="number" step="any" class="form-control" name="V26" placeholder="Enter V26 value" required>
+                                        <div class="pca-description">Measure of transaction randomness</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-chess-rook"></i>Strategic Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V27" placeholder="Enter V27 value" required>
+                                        <div class="pca-description">Patterns indicating strategic behavior</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="pca-component">
+                                        <label class="feature-label"><i class="fas fa-chess-queen"></i>Dominant Pattern </label>
+                                        <input type="number" step="any" class="form-control" name="V28" placeholder="Enter V28 value" required>
+                                        <div class="pca-description">Most significant behavioral pattern</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-search me-2"></i>Analyze Transaction
+                                </button>
+                            </div>
+                        </form>
+
+                        {% if prediction_text %}
+                            <div class="result-box 
+                                {% if 'Safe' in prediction_text %}safe
+                                {% elif 'Fraudulent' in prediction_text %}fraud
+                                {% elif 'Error' in prediction_text %}error
+                                {% endif %}">
+                                <i class="fas 
+                                    {% if 'Safe' in prediction_text %}fa-check-circle 
+                                    {% elif 'Fraudulent' in prediction_text %}fa-exclamation-triangle 
+                                    {% elif 'Error' in prediction_text %}fa-times-circle 
+                                    {% endif %}me-2"></i>
+                                {{ prediction_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <h5><i class="fas fa-shield-alt me-2"></i>Fraud Detection System</h5>
+                    <p>Protecting your financial transactions with advanced AI</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">Credit Card Fraud Detection System &copy; 2023</p>
+                    <p class="small">Note: This is a demonstration application. For actual fraud detection, consult with financial security experts.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tooltip initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Add animation class to PCA components
+            const pcaComponents = document.querySelectorAll('.pca-component');
+            pcaComponents.forEach((component, index) => {
+                component.classList.add('animate-fade');
+                component.style.animationDelay = `${0.3 + (index * 0.05)}s`;
+            });
+        });
+    </script>
+</body>
+</html>
